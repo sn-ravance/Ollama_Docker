@@ -5,7 +5,7 @@ A production‑ready Docker Compose stack to run Ollama locally with zero‑trus
 - Private, internal‑only network for the Ollama runtime
 - NGINX reverse proxy terminating TLS/mTLS (client certs)
 - Optional OIDC authentication via oauth2-proxy (works with Entra ID/Okta/Google, etc.)
-- ocked‑down container privileges, rate limiting, CORS, and structured logs
+- Locked‑down container privileges, rate limiting, CORS, and structured logs
 - Clear placeholders and comments so you can adapt it quickly on your machine
 
 ## Install/Setup
