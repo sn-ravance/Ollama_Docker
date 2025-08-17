@@ -82,3 +82,31 @@ sequenceDiagram
 - The Prompt/Policy Filter is optional but recommended for PII redaction, jailbreak/prompt‑injection screening, and use‑case/tenant scoping.
 - Ollama remains on an internal network (no host port mapping) and only accepts traffic from NGINX.
 - Logs flow to your local SIEM/Cribl agent for audit trails and compliance reporting.
+
+## ZTA
+Here’s how the Azure Entra ID OIDC + mTLS + NGINX + Ollama architecture aligns with Zero Trust Architecture (ZTA) principles:
+1. Verify Explicitly
+  - mTLS at the edge: Every client must present a valid certificate before any request is processed.
+  - OIDC with Entra ID: Strong identity verification using enterprise IdP, MFA, and conditional access policies.
+  - Continuous validation: oauth2-proxy checks session tokens on every request via auth_request.
+2. Least Privilege Access
+  - Role-Based Access Control (RBAC): NGINX receives user identity and group claims from oauth2-proxy, enabling fine-grained authorization.
+  - Scoped tokens: OIDC tokens only include necessary claims (openid, profile, email).
+  - No direct Ollama exposure: Ollama runs on an internal network; only NGINX can reach it.
+3. Assume Breach
+- Network segmentation: Internal Docker network isolates Ollama and oauth2-proxy from the host and internet.
+- Defense-in-depth:
+  - WAF and rate limiting at NGINX.
+  - Optional prompt/policy filter to block malicious or sensitive requests.
+  - Logging & monitoring: All access, auth, and policy decisions are logged to SIEM for anomaly detection.
+4. Secure All Communications
+- TLS 1.3 everywhere: Between client ↔ NGINX and NGINX ↔ oauth2-proxy.
+- mTLS: Ensures both client and server authenticate each other.
+- Encrypted storage: Model files and logs stored on encrypted volumes.
+5. Continuous Monitoring & Governance
+- SIEM integration: Logs from NGINX, oauth2-proxy, and Ollama feed into local or enterprise SIEM.
+- Policy enforcement: Prompt filter enforces compliance and security policies dynamically.
+- Automated health checks: Docker health probes for all services.
+
+This design removes implicit trust, enforces identity-based access, and monitors every transaction, which are core ZTA principles.
+
