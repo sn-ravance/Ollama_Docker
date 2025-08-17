@@ -31,11 +31,11 @@
 4. Accessing Different Models
 - Models are stored in the encrypted volume (ollama-data).
 - To list models:
-  ```
+    ```
     curl --cert client-cert.pem --key client-key.pem \
      --cacert ca-cert.pem \
      https://localhost/api/tags
-  ``` 
+    ``` 
 
 - To switch models, specify the model parameter in the API call:
   - ```
@@ -45,12 +45,12 @@
 - To add a new model:
   - Temporarily allow controlled egress or preload the model into the volume.
   - Use:
-    - ```
-      curl --cert client-cert.pem --key client-key.pem \
+    ```
+    curl --cert client-cert.pem --key client-key.pem \
      --cacert ca-cert.pem \
      -X POST -d '{"name":"mistral"}' \
      https://localhost/api/pull
-      ```
+    ```
 
 5. Security & Compliance in Action
 - All prompts and responses flow through NGINX → optional Prompt Filter → Ollama.
