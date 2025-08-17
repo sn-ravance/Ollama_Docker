@@ -1,20 +1,22 @@
-What this shows
-NGINX is the only exposed endpoint (bound to 127.0.0.1:443), enforcing mTLS and acting as the policy enforcement point (WAF, rate limiting, CORS, headers).
-oauth2‑proxy provides OIDC SSO, with NGINX using auth_request to gate /api/*.
-Ollama is reachable only on the internal Docker network (no host port mapping).
-Models live in an encrypted volume; logs stream to a local SIEM/Cribl Edge for audit/compliance.
+## What this shows
+- NGINX is the only exposed endpoint (bound to 127.0.0.1:443), enforcing mTLS and acting as the policy enforcement point (WAF, rate limiting, CORS, headers).
+- oauth2‑proxy provides OIDC SSO, with NGINX using auth_request to gate /api/*.
+- Ollama is reachable only on the internal Docker network (no host port mapping).
+- Models live in an encrypted volume; logs stream to a local SIEM/Cribl Edge for audit/compliance.
 
-Key controls
-mTLS ensures only clients with a trusted certificate reach the proxy.
-OIDC (oauth2‑proxy) provides user identity; NGINX receives X-Auth-Request-User/group headers to enable RBAC/ABAC at the edge.
-NGINX enforces rate limits, CORS, and security headers before any request touches Ollama.
-Ollama is shielded on an internal network with no host‑exposed port.
-Optional Add‑Ons you might want
-Prompt security filter (simple regex or policy engine) as another internal microservice called by NGINX via auth_request before proxying to Ollama.
-Token & context caps via NGINX request body size limits and upstream timeouts.
-Model routing (e.g., different upstreams by path /api/generate/llama vs /api/generate/mixtral) for environment separation.
+## Key controls
+- mTLS ensures only clients with a trusted certificate reach the proxy.
+- OIDC (oauth2‑proxy) provides user identity; NGINX receives X-Auth-Request-User/group headers to enable RBAC/ABAC at the edge.
+- NGINX enforces rate limits, CORS, and security headers before any request touches Ollama.
+- Ollama is shielded on an internal network with no host‑exposed port.
+
+## Optional Add‑Ons you might want
+- Prompt security filter (simple regex or policy engine) as another internal microservice called by NGINX via auth_request before proxying to Ollama.
+- Token & context caps via NGINX request body size limits and upstream timeouts.
+- Model routing (e.g., different upstreams by path /api/generate/llama vs /api/generate/mixtral) for environment separation.
 
 ## Diagram
+(See Ollama_ZTA_SeqDia.png)
 ```
 sequenceDiagram
     actor C as Client (Browser/CLI)
