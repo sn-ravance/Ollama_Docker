@@ -1,4 +1,4 @@
-# Ollama Docker Container
+# Ollama Docker ZTA
 
 ## Description
 A production‑ready Docker Compose stack to run Ollama locally with zero‑trust and compliance controls:
