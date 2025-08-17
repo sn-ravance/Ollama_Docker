@@ -2,7 +2,7 @@
 1. Open a terminal in the folder with docker-compose.yml.
 2. Run:
 ```
- docker compose up -d
+docker compose up -d
 ```
 
 3. Verify services:
