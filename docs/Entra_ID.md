@@ -5,7 +5,8 @@ A step-by-step guide for integrating Azure Entra ID (OIDC) with your Ollama Zero
 - Azure subscription with Entra ID admin rights.
 - Your tenant ID (find in Azure Portal → Azure Active Directory → Overview).
 - The redirect URI for oauth2-proxy:
-``
+
+```
 https://localhost/oauth2/callback
 ```
 
@@ -19,9 +20,11 @@ https://localhost/oauth2/callback
 4. Redirect URI:
   - Type: Web
   - Value:
+
   ```
   https://localhost/oauth2/callback
   ```
+
 5. Click Register.
 
 ## Step 2: Configure App Settings
@@ -36,11 +39,13 @@ https://localhost/oauth2/callback
 ## Step 3: Set API Permissions
 - Go to API permissions → Add a permission → Microsoft Graph → Delegated permissions:
   - Select:
+
   ```
-openid
-profile
-email
+  openid
+  profile
+  email
   ```
+
 - Click Grant admin consent.
 
 ## Step 4: Configure oauth2-proxy Environment
