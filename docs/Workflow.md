@@ -31,11 +31,11 @@
 4. Accessing Different Models
 - Models are stored in the encrypted volume (ollama-data).
 - To list models:
-  - ```
+  ```
     curl --cert client-cert.pem --key client-key.pem \
      --cacert ca-cert.pem \
      https://localhost/api/tags
-    ``` 
+  ``` 
 
 - To switch models, specify the model parameter in the API call:
   - ```
