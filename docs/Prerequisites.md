@@ -2,7 +2,7 @@ The prerequisites you need before running the Ollama Zero-Trust Deployment local
 
 ## 1. Hardware Requirements
 - CPU: Modern x86_64 processor (Intel i7/AMD Ryzen or better).
-- RAM: Minimum 16 GB (32 GB recommended for large models).
+- RAM: Minimum 64 GB.
 - GPU (optional): NVIDIA GPU with CUDA support for acceleration (8 GB+ VRAM recommended).
 - Disk: At least 50 GB free (models can be large; encrypt the disk for compliance).
 

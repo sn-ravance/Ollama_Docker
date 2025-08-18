@@ -21,6 +21,9 @@ services:
       OLLAMA_HOST: 0.0.0.0:11434
       # Restrict CORS to the proxy origin you expose (adjust to your hostname)
       OLLAMA_ORIGINS: "https://localhost"
+      # Limit resident models and avoid parallel evals to reduce memory usage
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
     volumes:
       # Persistent encrypted model cache (encrypt the underlying disk/FS)
       - ollama-data:/root/.ollama:rw,noexec
@@ -42,7 +45,7 @@ services:
       nproc: 4096
       nofile: 65536
     # Resource guards (Compose supports these keys for local Docker)
-    mem_limit: "16g"
+    mem_limit: "48g"
     cpus: "8.0"
     logging:
       driver: "json-file"

@@ -125,3 +125,12 @@ curl --cert ./certs/client-cert.pem --key ./certs/client-key.pem \
 - __OLLAMA_ORIGINS__: In `docker-compose.yml`, set `OLLAMA_ORIGINS` to your exact UI origin(s), e.g., `https://ai.example.com`. Avoid wildcards.
 - __NGINX server_name__: If you change certificate hostnames, update `server_name` in `nginx/nginx.conf` for both vhosts.
 - __OIDC redirect__: Update `OAUTH2_PROXY_REDIRECT_URL` and `OAUTH2_PROXY_WHITELIST_DOMAINS` in `docker-compose.yml` when hostnames change.
+
+
+# Limitations
+
+On Macbook Pro M4 with 48GB - requires more system memory (41.9 GiB) than is available (8.0 GiB). The binary version of Ollama can support it
+
+# To Do
+- Determine the available memory, and the requirements to run a model
+- Optimize the architecture (if possible) to handle large models
