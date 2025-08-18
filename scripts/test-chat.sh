@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Configuration
-MODEL=${MODEL:-llama3.2:latest}
+MODEL=${MODEL:-llama3.3:latest}
 PROMPT=${PROMPT:-"Explain zero trust in one paragraph."}
 CERT_ARGS=(
   --cert certs/client-cert.pem
