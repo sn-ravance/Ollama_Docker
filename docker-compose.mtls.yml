@@ -1,0 +1,74 @@
+# mTLS-only stack (no oauth2-proxy). Use:
+#   docker compose -f docker-compose.mtls.yml up -d
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    networks:
+      - backend
+    expose:
+      - "11434"
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_ORIGINS: "https://localhost"
+    volumes:
+      - ollama-data:/root/.ollama:rw,noexec
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 1073741824
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    ulimits:
+      nproc: 4096
+      nofile: 65536
+    mem_limit: "16g"
+    cpus: "8.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-mtls
+    restart: unless-stopped
+    networks:
+      - backend
+      - public
+    ports:
+      - "4443:4443"
+    depends_on:
+      - ollama
+    volumes:
+      - ./nginx/nginx.mtls.conf:/etc/nginx/nginx.conf:ro
+      - ./certs/server-cert.pem:/etc/nginx/tls/server.crt:ro
+      - ./certs/server-key.pem:/etc/nginx/tls/server.key:ro
+      - ./certs/ca-cert.pem:/etc/nginx/tls/ca.crt:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q --no-check-certificate -O- https://127.0.0.1:4443/healthz >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  ollama-data:
+
+networks:
+  backend:
+    driver: bridge
+    internal: true
+  public:
+    driver: bridge

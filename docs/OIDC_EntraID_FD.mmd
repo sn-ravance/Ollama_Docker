@@ -1,0 +1,117 @@
+flowchart TD
+  %% =========================
+  %% STYLES
+  %% =========================
+  classDef edge      fill:#0b3d91,stroke:#0b3d91,color:#fff
+  classDef gate      fill:#e8f0fe,stroke:#5f86ff,color:#111
+  classDef svc       fill:#ffffff,stroke:#777,color:#111
+  classDef policy    fill:#fff7e6,stroke:#ffb84d,color:#111
+  classDef store     fill:#f2fff2,stroke:#8bc34a,color:#111
+  classDef cloud     fill:#eefaff,stroke:#58b7ff,color:#111
+  classDef term      fill:#fef2f2,stroke:#e57373,color:#111
+  classDef ok        fill:#e8f5e9,stroke:#66bb6a,color:#111
+
+  %% =========================
+  %% CLOUD FIRST
+  %% =========================
+  subgraph CLOUD["Azure Entra ID (Cloud)"]
+    direction TB
+    ENTRA["Azure Entra ID (OIDC)"]
+  end
+
+  %% =========================
+  %% LOCAL PC
+  %% =========================
+  subgraph LOCAL["Local PC - Zero Trust Gateway"]
+    direction TB
+
+    C["Client"]
+    N["NGINX Gateway"]
+    O2P["oauth2-proxy"]
+    PF["Prompt Policy Filter"]
+    OLL["Ollama Runtime"]
+    LOG["Local SIEM Logs"]
+
+    %% Entry
+    C --> N
+
+    %% mTLS
+    N --> K1{Client mTLS valid?}
+    R401["401 or 403 Blocked at edge"]
+    K1 -- No --> R401
+    R401 -.-> LOG
+    N2["mTLS OK"]
+    K1 -- Yes --> N2
+    N2 -.-> LOG
+
+    %% OIDC
+    N --> O2P
+    O2P --> K2{Valid OIDC session?}
+
+    %% Interactive login path
+    K2 -- No --> N3["302 to oauth2 start"]
+    N3 --> C
+    C --> O2P
+    O2P --> C
+    C --> ENTRA
+    ENTRA --> C
+    C --> O2P
+    O2P --> C
+    C --> N
+    N --> O2P
+    O2P --> N
+
+    %% Session already valid
+    K2 -- Yes --> O2P
+    O2P --> N
+
+    %% Optional policy filter
+    N --> K3{Policy filter enabled?}
+    K3 -- Yes --> PF
+    PF --> K4{Policy pass?}
+    R406["406 or 422 Blocked by policy"]
+    K4 -- No --> R406
+    R406 -.-> LOG
+    K4 -- Yes --> N
+    K3 -- No --> N
+
+    %% Proxy to Ollama
+    N --> OLL
+    OLL --> N
+    N --> C
+
+    %% Logging
+    N -.-> LOG
+    O2P -.-> LOG
+    PF -.-> LOG
+    OLL -.-> LOG
+  end
+
+  %% =========================
+  %% ERRORS
+  %% =========================
+  subgraph ERRORS["Common Azure OIDC Issues"]
+    direction TB
+    E1["AADSTS50011 Redirect URI mismatch"]
+    E2["Issuer mismatch"]
+    E3["Invalid client secret AADSTS7000215"]
+    E4["Missing scopes or consent"]
+  end
+
+  %% Cross refs
+  O2P -.-> E2
+  O2P -.-> E1
+  O2P -.-> E3
+  O2P -.-> E4
+
+  %% =========================
+  %% CLASS ASSIGNMENTS
+  %% =========================
+  class C,OLL svc
+  class N edge
+  class O2P,K1,K2,K3,K4,N3 gate
+  class PF policy
+  class R401,R406,E1,E2,E3,E4 term
+  class ENTRA cloud
+  class LOG store
+  class N2 ok

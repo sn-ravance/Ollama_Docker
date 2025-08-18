@@ -1,0 +1,32 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Certificates and private key material (keep example scripts only)
+certs/*.p12
+certs/*.csr
+certs/*.srl
+certs/*-key.pem
+# If you also generate client/server bundles under different names, ignore generically
+certs/*private*.pem
+certs/*key*.pem
+
+# Logs
+*.log
+logs/
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Temporary files
+*.tmp
+*.temp
+~*
+
+# Docker artifacts (none expected beyond volumes), but ignore local overrides
+docker-compose.override.yml

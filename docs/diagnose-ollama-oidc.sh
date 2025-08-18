@@ -146,11 +146,15 @@ else
   err "Expected containers (ollama, nginx, oauth2-proxy) not found. Did you run 'docker compose up -d'?"
 fi
 echo
-info "2) NGINX port binding & TLS"
-if ss -ltn '( sport = :'$PORT' )' 2>/dev/null | grep -q ":$PORT"; then
-  ok "Port $PORT is listening."
+info "2) NGINX reachability (TCP)"
+if command -v nc >/dev/null 2>&1; then
+  if nc -z "$HOST" "$PORT" >/dev/null 2>&1; then
+    ok "Port $PORT reachable via TCP."
+  else
+    warn "Port $PORT not reachable via TCP (service down or firewall?)."
+  fi
 else
-  err "Port $PORT is not listening on the host."
+  warn "'nc' not available; skipping raw TCP reachability test."
 fi
 
 # If certs provided, probe /healthz with mTLS; else do a basic HTTPS probe with -k
@@ -267,12 +271,12 @@ else
 fi
 echo
 info "10) NGINX container & logs"
-if docker ps --format '{{.Names}}' | grep -q '^ollama-gateway$'; then
-  docker inspect --format '  - Status: {{.State.Status}}  Health: {{if .State.Health}}{{.State.Health.Status}}{{else}}n/a{{end}}' ollama-gateway || true
+if docker ps --format '{{.Names}}' | grep -q '^nginx$'; then
+  docker inspect --format '  - Status: {{.State.Status}}  Health: {{if .State.Health}}{{.State.Health.Status}}{{else}}n/a{{end}}' nginx || true
   echo "  Last 20 log lines:"
-  docker logs --tail 20 ollama-gateway || true
+  docker logs --tail 20 nginx || true
 else
-  warn "NGINX container (ollama-gateway) not found."
+  warn "NGINX container (nginx) not found."
 fi
 echo
 ok "Diagnostics complete."

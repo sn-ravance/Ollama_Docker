@@ -1,11 +1,24 @@
 ## 1. Start the Secure Stack
-1. Open a terminal in the folder with docker-compose.yml.
-2. Run:
+0. Generate TLS/mTLS certs (required):
 ```
-docker compose up -d
+cd certs && bash gencerts.sh
+cd ..
 ```
 
-3. Verify services:
+1. Open a terminal in the project folder.
+2. Optional (for OIDC/SSO): copy `.env.example` to `.env` and populate `OAUTH2_PROXY_COOKIE_SECRET`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_ISSUER_URL`.
+3. Start with OIDC (auto-opens login):
+```
+./start.sh full --open
+# or open a private/incognito window (macOS: Chrome/Edge/Brave/Firefox)
+./start.sh full --open-incognito
+```
+   Or run mTLS-only (no OIDC) alternative mode:
+```
+./start.sh mtls
+```
+
+4. Verify services:
 ```
 docker ps
 ```
@@ -24,21 +37,22 @@ https://localhost
 - If OIDC is enabled:
   - You’ll be redirected to your Identity Provider for login + MFA.
   - After login, you’ll return to the Ollama gateway.
+  - Note: In full mode, the API on `https://api.localhost` requires both your client certificate (mTLS) and an active OIDC session.
 
 ## 4. Interact with Ollama
-** List Available Models**
+** List Available Models (mTLS vhost)**
 ```
 curl --cert ./certs/client-cert.pem --key ./certs/client-key.pem \
      --cacert ./certs/ca-cert.pem \
-     https://localhost/api/tags
+     https://api.localhost/api/tags
 
 ```
 
-** Generate Text **
+** Generate Text (mTLS vhost)**
 ```
 curl --cert ./certs/client-cert.pem --key ./certs/client-key.pem \
      --cacert ./certs/ca-cert.pem \
-     -X POST https://localhost/api/generate \
+     -X POST https://api.localhost/api/generate \
      -H "Content-Type: application/json" \
      -d '{
            "model": "llama3",
@@ -55,7 +69,7 @@ curl --cert ./certs/client-cert.pem --key ./certs/client-key.pem \
 ```
 curl --cert ./certs/client-cert.pem --key ./certs/client-key.pem \
      --cacert ./certs/ca-cert.pem \
-     -X POST https://localhost/api/pull \
+     -X POST https://api.localhost/api/pull \
      -H "Content-Type: application/json" \
      -d '{"name":"mistral"}'
 ```
